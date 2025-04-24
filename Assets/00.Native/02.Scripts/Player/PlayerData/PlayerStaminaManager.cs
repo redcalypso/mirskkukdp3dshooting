@@ -1,21 +1,20 @@
 using UnityEngine;
 
-public class PlayerStaminaManager : MonoBehaviour
+public class PlayerStaminaManager : PlayerComponent
 {
-    [SerializeField] private PlayerStats playerStats;
-    
     private float currentStamina;
     private float lastStaminaUseTime;
     private bool isInitialized;
 
     public float CurrentStamina => currentStamina;
-    public float MaxStamina => playerStats.maxStamina;
+    public float MaxStamina => _player.playerStats.maxStamina;
 
-    private void Start()
+    protected override void Awake()
     {
-        if (playerStats == null)
+        base.Awake();
+        if (_player == null || _player.playerStats == null)
         {
-            Debug.LogError("PlayerStats not assigned!");
+            Debug.LogError($"[{GetType().Name}] Player or PlayerStats not found!");
             return;
         }
         Initialize();
@@ -23,7 +22,7 @@ public class PlayerStaminaManager : MonoBehaviour
 
     private void Initialize()
     {
-        currentStamina = playerStats.maxStamina;
+        currentStamina = _player.playerStats.maxStamina;
         lastStaminaUseTime = 0f;
         isInitialized = true;
     }
@@ -36,6 +35,7 @@ public class PlayerStaminaManager : MonoBehaviour
 
     public bool CanUseStamina(float cost)
     {
+        if (!isInitialized) return false;
         return currentStamina >= cost;
     }
 
@@ -48,10 +48,12 @@ public class PlayerStaminaManager : MonoBehaviour
 
     private void UpdateStamina()
     {
-        if (Time.time - lastStaminaUseTime >= playerStats.staminaRegenDelay)
+        if (!isInitialized || _player == null || _player.playerStats == null) return;
+
+        if (Time.time - lastStaminaUseTime >= _player.playerStats.staminaRegenDelay)
         {
-            currentStamina = Mathf.Min(playerStats.maxStamina, 
-                currentStamina + playerStats.staminaRegenRate * Time.deltaTime);
+            currentStamina = Mathf.Min(_player.playerStats.maxStamina, 
+                currentStamina + _player.playerStats.staminaRegenRate * Time.deltaTime);
         }
     }
 } 

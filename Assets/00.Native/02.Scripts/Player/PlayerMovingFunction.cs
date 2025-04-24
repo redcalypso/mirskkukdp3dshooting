@@ -1,14 +1,14 @@
 using UnityEngine;
 
-public class PlayerMovingFunction : MonoBehaviour
+public class PlayerMovingFunction : PlayerComponent
 {
     //requirements
     private CharacterController _characterController;
     private CameraController _cameraController; 
+    private PlayerStaminaManager _staminaManager;
 
     [Header("Player Stats")]
     [SerializeField] private PlayerStats _playerStats;
-    private PlayerStaminaManager _staminaManager;
 
     [Header("Movement Settings")]
     [SerializeField] private float _playerMoveSpeed = 5f;
@@ -24,7 +24,6 @@ public class PlayerMovingFunction : MonoBehaviour
     private float _slideTimer;
     private float _slideCooldownTimer;
 
-
     [Header("Wall Climbing Settings")]
     [SerializeField] private float _wallClimbSpeed = 2f;
     [SerializeField] private float _wallCheckDistance = 0.6f;
@@ -39,11 +38,20 @@ public class PlayerMovingFunction : MonoBehaviour
     private Vector3 _velocity;
     private const float GRAVITY = -9.81f;
 
-    void Start()
+    protected override void Awake()
     {
+        base.Awake();
+        if (_player == null) return;
+
         _characterController = GetComponent<CharacterController>();
         _cameraController = Camera.main.GetComponent<CameraController>();
         _staminaManager = GetComponent<PlayerStaminaManager>();
+
+        if (_characterController == null || _cameraController == null || _staminaManager == null)
+        {
+            Debug.LogError($"[{GetType().Name}] Required components not found!");
+            return;
+        }
 
         _currentSpeed = _playerMoveSpeed;
         _currentJumpCount = 0;
@@ -51,6 +59,8 @@ public class PlayerMovingFunction : MonoBehaviour
 
     private void Update()
     {
+        if (_player == null || _staminaManager == null) return;
+
         HandleMovement();
         CheckWallCollision();
         HandleWallClimbing();
@@ -72,15 +82,19 @@ public class PlayerMovingFunction : MonoBehaviour
 
     private void CheckWallCollision()
     {
+        if (_player == null) return;
+
         RaycastHit hit;
         Vector3 forward = transform.forward;
         
-        _isTouchingWall = Physics.Raycast(transform.position, forward, out hit, _wallCheckDistance, _wallLayer) || Physics.Raycast(transform.position + Vector3.up * 0.5f, forward, out hit, _wallCheckDistance, _wallLayer);
-
+        _isTouchingWall = Physics.Raycast(transform.position, forward, out hit, _wallCheckDistance, _wallLayer) || 
+                         Physics.Raycast(transform.position + Vector3.up * 0.5f, forward, out hit, _wallCheckDistance, _wallLayer);
     }
 
     private void HandleMovement()
     {
+        if (_player == null || _staminaManager == null) return;
+
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
         Vector2 moveInput = new Vector2(horizontal, vertical);
@@ -92,10 +106,10 @@ public class PlayerMovingFunction : MonoBehaviour
             _moveDirection.y = 0;
 
             // sprint
-            if (Input.GetKey(KeyCode.LeftShift) && _staminaManager.CanUseStamina(_playerStats.sprintStaminaCost * Time.deltaTime))
+            if (Input.GetKey(KeyCode.LeftShift) && _staminaManager.CanUseStamina(_player.playerStats.sprintStaminaCost * Time.deltaTime))
             {
                 _currentSpeed = _playerSprintSpeed;
-                _staminaManager.UseStamina(_playerStats.sprintStaminaCost * Time.deltaTime);
+                _staminaManager.UseStamina(_player.playerStats.sprintStaminaCost * Time.deltaTime);
             }
             else _currentSpeed = _playerMoveSpeed;
         }
@@ -104,19 +118,23 @@ public class PlayerMovingFunction : MonoBehaviour
 
     private void HandleJump()
     {
+        if (_player == null || _staminaManager == null) return;
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (_currentJumpCount < _playerMaxJumpCount && _staminaManager.CanUseStamina(_playerStats.jumpStaminaCost))
+            if (_currentJumpCount < _playerMaxJumpCount && _staminaManager.CanUseStamina(_player.playerStats.jumpStaminaCost))
             {
                 _velocity.y = Mathf.Sqrt(_playerJumpForce * -1f * GRAVITY);
                 _currentJumpCount++;
-                _staminaManager.UseStamina(_playerStats.jumpStaminaCost);
+                _staminaManager.UseStamina(_player.playerStats.jumpStaminaCost);
             }
         }
     }
 
     private void HandleWallClimbing()
     {
+        if (_player == null || _staminaManager == null) return;
+
         if (Input.GetKey(KeyCode.Space))
         {
             if (_staminaManager.CanUseStamina(_wallClimbSpeed * Time.deltaTime) && _isTouchingWall)
@@ -132,6 +150,8 @@ public class PlayerMovingFunction : MonoBehaviour
 
     private void HandleSlide()
     {
+        if (_player == null || _staminaManager == null) return;
+
         if (_slideCooldownTimer > 0) _slideCooldownTimer -= Time.deltaTime;
 
         if (_isSliding)
@@ -144,12 +164,12 @@ public class PlayerMovingFunction : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.C) && !_isSliding && _slideCooldownTimer <= 0 && _moveDirection.magnitude > 0.1f)
         {
-            if (_staminaManager.CanUseStamina(_playerStats.slideStaminaCost))
+            if (_staminaManager.CanUseStamina(_player.playerStats.slideStaminaCost))
             {
                 _isSliding = true;
                 _slideTimer = _slideDuration;
                 _slideCooldownTimer = _slideCooldown;
-                _staminaManager.UseStamina(_playerStats.slideStaminaCost);
+                _staminaManager.UseStamina(_player.playerStats.slideStaminaCost);
             }
         }
     }

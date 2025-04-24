@@ -1,12 +1,13 @@
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : PlayerComponent
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private CameraController cameraController;
 
-    void Start()
+    protected override void Awake()
     {
+        base.Awake();
         // CameraController 컴포넌트 찾기
         cameraController = Camera.main.GetComponent<CameraController>();
         if (cameraController == null)
@@ -16,7 +17,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         // 카메라 방향에 따라 플레이어 Y축 회전
         if (cameraController != null)
