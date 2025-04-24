@@ -340,6 +340,7 @@ MonoBehaviour:
   handRotationSpeed: 10
   maxHandRotation: 80
   minHandRotation: -80
+  recoilReturnSpeed: 5
 --- !u!1 &205255562
 GameObject:
   m_ObjectHideFlags: 0
@@ -688,6 +689,7 @@ MonoBehaviour:
   topDownRotationOffset: {x: 70, y: 0, z: 0}
   mouseSensitivity: 2
   invertY: 0
+  recoilReturnSpeed: 5
 --- !u!1 &402571464
 GameObject:
   m_ObjectHideFlags: 0
@@ -705,6 +707,7 @@ GameObject:
   - component: {fileID: 402571473}
   - component: {fileID: 402571474}
   - component: {fileID: 402571475}
+  - component: {fileID: 402571476}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -892,6 +895,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerStats: {fileID: 11400000, guid: 47929365f118e2b49addf0f2cd940ec0, type: 2}
+--- !u!114 &402571476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 402571464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d392d5aa6637a94f9a9be01cdda4cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gunShootingFunction: {fileID: 3469287837123483974}
+  _grenadePrefab: {fileID: 3687854132075266607, guid: d91a4134b0424dd4f86b28a9228c3de1, type: 3}
+  _grenadeSpawnPoint: {fileID: 771994512}
+  _grenadeUI: {fileID: 697417234}
+  _minThrowForce: 5
+  _maxThrowForce: 25
+  _chargeTime: 3
+  _rechargeTime: 5
+  _maxGrenades: 3
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -1180,6 +1204,8 @@ GameObject:
   - component: {fileID: 697417229}
   - component: {fileID: 697417228}
   - component: {fileID: 697417232}
+  - component: {fileID: 697417233}
+  - component: {fileID: 697417234}
   m_Layer: 5
   m_Name: UI_Player
   m_TagString: Untagged
@@ -1288,6 +1314,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _staminaSlider: {fileID: 2146374257}
   _staminaManager: {fileID: 402571473}
+--- !u!114 &697417233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697417227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74664cbc0e83e5648a58b19ef7467ab7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ammoText: {fileID: 1047113463}
+  reloadRing: {fileID: 220544669}
+  fillColor: {r: 1, g: 1, b: 1, a: 0.5}
+  emptyColor: {r: 1, g: 1, b: 1, a: 0}
+--- !u!114 &697417234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697417227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4eac76f5388bb64793995c1036febce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grenadeText: {fileID: 167624112}
+  chargeRing: {fileID: 1981877837}
+  fillColor: {r: 1, g: 1, b: 1, a: 0.5}
+  emptyColor: {r: 1, g: 1, b: 1, a: 0}
 --- !u!1 &771994511
 GameObject:
   m_ObjectHideFlags: 0
@@ -1870,7 +1928,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1981877836
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2045,6 +2103,7 @@ GameObject:
   - component: {fileID: 543450653274085088}
   - component: {fileID: 3469287837123483973}
   - component: {fileID: 1711813855476510095}
+  - component: {fileID: 3469287837123483974}
   m_Layer: 0
   m_Name: Assault_Rifle_M4
   m_TagString: Untagged
@@ -2105,6 +2164,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132149622983770}
   m_Mesh: {fileID: 5402567031412629817, guid: d0de870e1e071ff4e841c05aeec60610, type: 3}
+--- !u!114 &3469287837123483974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132149622983770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c129474c6c8834d4196303aba31b66cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _gunPreset: {fileID: 11400000, guid: d89519e41a97a0d4a97400a4322d9226, type: 2}
+  _muzzlePoint: {fileID: 1291129776}
+  _playerCamera: {fileID: 330585545}
+  _ammoUI: {fileID: 697417233}
+  _cameraController: {fileID: 0}
+  _shakeAmount: 0.1
+  _shakeDuration: 0.1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

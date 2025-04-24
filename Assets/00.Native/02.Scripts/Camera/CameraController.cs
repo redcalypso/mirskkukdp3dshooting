@@ -31,8 +31,15 @@ public class CameraController : MonoBehaviour
     public float mouseSensitivity = 2f;
     public bool invertY = false;
 
+    [Header("Recoil Settings")]
+    public float recoilReturnSpeed = 5f;
+
     private float rotationX = 0f;
     private float rotationY = 0f;
+    private float recoilX = 0f;
+    private float recoilY = 0f;
+    private float targetRecoilX = 0f;
+    private float targetRecoilY = 0f;
     private Vector3 targetPosition;
     private Quaternion targetRotation;
     private bool isInitialized;
@@ -72,6 +79,7 @@ public class CameraController : MonoBehaviour
 
         // 마우스 입력 처리
         ProcessMouseInput();
+        UpdateRecoil();
     }
 
     void LateUpdate()
@@ -98,6 +106,13 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    private void UpdateRecoil()
+    {
+        // 반동값을 부드럽게 원래 위치로 복귀
+        recoilX = Mathf.Lerp(recoilX, targetRecoilX, Time.deltaTime * recoilReturnSpeed);
+        recoilY = Mathf.Lerp(recoilY, targetRecoilY, Time.deltaTime * recoilReturnSpeed);
+    }
+
     private void UpdateCameraPositionAndRotation()
     {
         switch (currentMode)
@@ -121,14 +136,22 @@ public class CameraController : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
         
         // FPS 카메라 회전 설정
-        Quaternion targetRotation = Quaternion.Euler(rotationX + fpsRotationOffset.x, rotationY + fpsRotationOffset.y, fpsRotationOffset.z);
+        Quaternion targetRotation = Quaternion.Euler(
+            rotationX - recoilX + fpsRotationOffset.x, 
+            rotationY + recoilY + fpsRotationOffset.y, 
+            fpsRotationOffset.z
+        );
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, smoothSpeed * Time.deltaTime);
     }
 
     void UpdateTPSCamera()
     {
         // TPS 카메라 위치 계산
-        Vector3 rotation = new Vector3(rotationX + tpsRotationOffset.x, rotationY + tpsRotationOffset.y, tpsRotationOffset.z);
+        Vector3 rotation = new Vector3(
+            rotationX - recoilX + tpsRotationOffset.x, 
+            rotationY + recoilY + tpsRotationOffset.y, 
+            tpsRotationOffset.z
+        );
         Quaternion targetRotation = Quaternion.Euler(rotation);
         
         Vector3 desiredPosition = target.position + targetRotation * tpsOffset;
@@ -159,5 +182,26 @@ public class CameraController : MonoBehaviour
     public float GetCameraRotationX()
     {
         return rotationX;
+    }
+
+    public void SetCameraRotationX(float value)
+    {
+        rotationX = value;
+    }
+
+    public void AddRecoil(float x, float y)
+    {
+        targetRecoilX += x;
+        targetRecoilY += y;
+    }
+
+    public float GetRecoilX()
+    {
+        return recoilX;
+    }
+
+    public float GetRecoilY()
+    {
+        return recoilY;
     }
 }
