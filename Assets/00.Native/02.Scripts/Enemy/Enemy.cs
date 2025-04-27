@@ -1,33 +1,78 @@
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.UI;
 
 public enum EnemyState
 {
     Idle,
     Track,
     Return,
-    Damaged,
     Attack,
     Die
 }
-public class Enemy : MonoBehaviour
+
+public class Enemy : MonoBehaviour, IDamageable
 {
+    // requirements
+    [SerializeField] private EnemyPreset _enemyPreset;
     [SerializeField] private EnemyState _enemyState;
     [SerializeField] private Transform _player;
 
-    private CharacterController _characterController;
-    public float _speed = 5f;
-    public float _findDistance = 10f;
-    public float _attackDistance = 2f;
+    [Header("Health Bar UI")]
+    [SerializeField] private Canvas _healthBarCanvas;
+    [SerializeField] private Slider _healthSlider;
+    [SerializeField] private float _healthBarHeight = 2f;
+
+    private NavMeshAgent _agent;
     private Vector3 _startPosition;
+    private float _currentHealth;
+    private bool _isKnockback;
+    private float _knockbackEndTime;
+
+    public bool IsDead => _currentHealth <= 0;
+
+    private void Awake()
+    {
+        _agent = GetComponent<NavMeshAgent>();
+        _startPosition = transform.position;
+        _currentHealth = _enemyPreset.MaxHealth;
+    }
 
     private void Start()
     {
-        _player = GameObject.Find("Player").transform;
+        _player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        
+        if (_player == null)
+        {
+            Debug.LogWarning("Player Tag Missing");
+        }
+
         _enemyState = EnemyState.Idle;
+        InitializeHealthBar();
     }
-    
+
+    private void InitializeHealthBar()
+    {
+        if (_healthSlider != null)
+        {
+            _healthSlider.maxValue = _enemyPreset.MaxHealth;
+            _healthSlider.value = _currentHealth;
+            _healthBarCanvas.gameObject.SetActive(false);
+        }
+    }
+
     private void Update()
     {
+        if (_isKnockback)
+        {
+            if (Time.time >= _knockbackEndTime)
+            {
+                _isKnockback = false;
+                _agent.enabled = true;
+            }
+            return;
+        }
+
         switch (_enemyState)
         {
             case EnemyState.Idle:
@@ -39,9 +84,6 @@ public class Enemy : MonoBehaviour
             case EnemyState.Return:
                 Return();
                 break;
-            case EnemyState.Damaged:
-                // Damaged();
-                break;
             case EnemyState.Attack:
                 Attack();
                 break;
@@ -50,66 +92,94 @@ public class Enemy : MonoBehaviour
                 break;
         }
     }
-    
+
     private void Idle()
     {
-        Debug.Log("Idle");
-        if(Vector3.Distance(transform.position, _player.position) < _findDistance)
-        {
-            _enemyState = EnemyState.Track;
-        }
+        if (_player != null && Vector3.Distance(transform.position, _player.position) < _enemyPreset.FindDistance) _enemyState = EnemyState.Track;
     }
 
     private void Track()
     {
-        Debug.Log("Track");
-        Vector3 direction = (_player.position - transform.position).normalized;
-        _characterController.Move(direction * _speed * Time.deltaTime);
+        if (_player == null) return;
 
-        if(Vector3.Distance(transform.position, _player.position) > _findDistance)
-        {
-            _enemyState = EnemyState.Return;
-        }
+        _agent.SetDestination(_player.position);
 
-        if(Vector3.Distance(transform.position, _player.position) < _attackDistance)
-        {
-            _enemyState = EnemyState.Attack;
-        }
+        float distanceToPlayer = Vector3.Distance(transform.position, _player.position);
+        if (distanceToPlayer > _enemyPreset.FindDistance)  _enemyState = EnemyState.Return;
+        else if (distanceToPlayer <= _enemyPreset.AttackDistance) _enemyState = EnemyState.Attack;
     }
 
     private void Return()
     {
-        Debug.Log("Return");
-        if(Vector3.Distance(transform.position, _startPosition) <= 0.1f)
-        {
-            Vector3 direction = (_startPosition - transform.position).normalized;
-            _characterController.Move(direction * _speed * Time.deltaTime);
-        }
-        else
-        {
-            _enemyState = EnemyState.Idle;
-        }
+        _agent.SetDestination(_startPosition);
+
+        if (Vector3.Distance(transform.position, _startPosition) <= 0.1f) _enemyState = EnemyState.Idle;
     }
-
-    /*private void Damaged(Damage damage)
-    {
-        Debug.Log("Damaged");
-        Health -= damage.Value;
-
-        _enemyState = EnemyState.Track;
-    }*/
 
     private void Attack()
     {
-        Debug.Log("Attack");
-        if(Vector3.Distance(transform.position, _player.position) > _attackDistance)
-        {
+        if (_player == null) return;
 
+        if (Vector3.Distance(transform.position, _player.position) > _enemyPreset.AttackDistance) _enemyState = EnemyState.Track;
+        else
+        {
+            // TODO: 공격 로직 구현
+            Debug.Log($"{gameObject.name} is attacking player!");
         }
     }
 
     private void Die()
     {
-        Debug.Log("Die");
+        // TODO: 사망 효과 추가
+        gameObject.SetActive(false);
     }
-}
+
+    public void TakeDamage(int damage)
+    {
+        if (IsDead) return;
+
+        _currentHealth -= damage;
+        UpdateHealthBar();
+        
+        if (IsDead) _enemyState = EnemyState.Die;
+        else
+        {
+            ApplyKnockback();
+            _enemyState = EnemyState.Track;
+        }
+    }
+
+    private void UpdateHealthBar()
+    {
+        if (_healthSlider == null) return;
+
+        _healthSlider.value = _currentHealth;
+        _healthBarCanvas.gameObject.SetActive(_currentHealth < _enemyPreset.MaxHealth);
+    }
+
+    private void ApplyKnockback()
+    {
+        if (_player == null) return;
+
+        _isKnockback = true;
+        _agent.enabled = false;
+        _knockbackEndTime = Time.time + _enemyPreset.KnockbackDuration;
+
+        Vector3 knockbackDirection = (transform.position - _player.position).normalized;
+        knockbackDirection.y = 0;
+        
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null) rb.AddForce(knockbackDirection * _enemyPreset.KnockbackForce, ForceMode.Impulse);
+    }
+
+    private void OnValidate()
+    {
+        // Set the health bar position above the enemy
+        if (_healthBarCanvas != null)
+        {
+            Vector3 position = transform.position;
+            position.y += _healthBarHeight;
+            _healthBarCanvas.transform.position = position;
+        }
+    }
+} 

@@ -2,28 +2,21 @@ using UnityEngine;
 
 public class PlayerController : PlayerComponent
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    private CameraController cameraController;
+    private Camera_CameraController cameraController;
 
     protected override void Awake()
     {
         base.Awake();
-        // CameraController 컴포넌트 찾기
-        cameraController = Camera.main.GetComponent<CameraController>();
-        if (cameraController == null)
-        {
-            Debug.LogWarning("CameraController not found in the scene!");
-        }
+        cameraController = Camera.main.GetComponent<Camera_CameraController>();
+        if (cameraController == null) Debug.LogWarning("Camera_CameraController not found in the scene!");
     }
 
-    // Update is called once per frame
     private void Update()
     {
-        // 카메라 방향에 따라 플레이어 Y축 회전
         if (cameraController != null)
         {
             Vector3 cameraForward = cameraController.transform.forward;
-            cameraForward.y = 0; // Y축 회전만 적용하기 위해 Y값을 0으로 설정
+            cameraForward.y = 0;
             if (cameraForward != Vector3.zero)
             {
                 Quaternion targetRotation = Quaternion.LookRotation(cameraForward);

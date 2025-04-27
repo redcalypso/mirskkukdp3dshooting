@@ -39,10 +39,7 @@ public class UI_Ammo : MonoBehaviour
             reloadRing.fillAmount = fillAmount;
             reloadRing.color = Color.Lerp(emptyColor, fillColor, fillAmount);
 
-            if (_reloadTimer <= 0)
-            {
-                StopReloadUI();
-            }
+            if (_reloadTimer <= 0) StopReloadUI();
         }
     }
 

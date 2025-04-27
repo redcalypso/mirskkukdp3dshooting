@@ -1,11 +1,10 @@
 using UnityEngine;
-
 public class PlayerMovingFunction : PlayerComponent
 {
     //requirements
     private CharacterController _characterController;
-    private CameraController _cameraController; 
-    private PlayerStaminaManager _staminaManager;
+    private Camera_CameraController _cameraController; 
+    private PlayerStaminaFunction _staminaManager;
 
     [Header("Player Stats")]
     [SerializeField] private PlayerStats _playerStats;
@@ -44,8 +43,8 @@ public class PlayerMovingFunction : PlayerComponent
         if (_player == null) return;
 
         _characterController = GetComponent<CharacterController>();
-        _cameraController = Camera.main.GetComponent<CameraController>();
-        _staminaManager = GetComponent<PlayerStaminaManager>();
+        _cameraController = Camera.main.GetComponent<Camera_CameraController>();
+        _staminaManager = GetComponent<PlayerStaminaFunction>();
 
         if (_characterController == null || _cameraController == null || _staminaManager == null)
         {
@@ -67,16 +66,12 @@ public class PlayerMovingFunction : PlayerComponent
         HandleJump();
         HandleSlide();
 
-        // move setting
         if (_moveDirection.magnitude > 0.1f && !_isSliding) _characterController.Move(_moveDirection * _currentSpeed * Time.deltaTime);
 
-        // gravity
         if (!_isWallClimbing) _velocity.y += GRAVITY * Time.deltaTime;
 
-        // move
         _characterController.Move(_velocity * Time.deltaTime);
 
-        // jump count reset
         if (_characterController.collisionFlags == CollisionFlags.Below) _currentJumpCount = 0;
     }
 
@@ -87,8 +82,7 @@ public class PlayerMovingFunction : PlayerComponent
         RaycastHit hit;
         Vector3 forward = transform.forward;
         
-        _isTouchingWall = Physics.Raycast(transform.position, forward, out hit, _wallCheckDistance, _wallLayer) || 
-                         Physics.Raycast(transform.position + Vector3.up * 0.5f, forward, out hit, _wallCheckDistance, _wallLayer);
+        _isTouchingWall = Physics.Raycast(transform.position, forward, out hit, _wallCheckDistance, _wallLayer) || Physics.Raycast(transform.position + Vector3.up * 0.5f, forward, out hit, _wallCheckDistance, _wallLayer);
     }
 
     private void HandleMovement()
@@ -106,10 +100,10 @@ public class PlayerMovingFunction : PlayerComponent
             _moveDirection.y = 0;
 
             // sprint
-            if (Input.GetKey(KeyCode.LeftShift) && _staminaManager.CanUseStamina(_player.playerStats.sprintStaminaCost * Time.deltaTime))
+            if (Input.GetKey(KeyCode.LeftShift) && _staminaManager.CanUseStamina(_player.PlayerStats.SprintStaminaCost * Time.deltaTime))
             {
                 _currentSpeed = _playerSprintSpeed;
-                _staminaManager.UseStamina(_player.playerStats.sprintStaminaCost * Time.deltaTime);
+                _staminaManager.UseStamina(_player.PlayerStats.SprintStaminaCost * Time.deltaTime);
             }
             else _currentSpeed = _playerMoveSpeed;
         }
@@ -122,11 +116,11 @@ public class PlayerMovingFunction : PlayerComponent
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if (_currentJumpCount < _playerMaxJumpCount && _staminaManager.CanUseStamina(_player.playerStats.jumpStaminaCost))
+            if (_currentJumpCount < _playerMaxJumpCount && _staminaManager.CanUseStamina(_player.PlayerStats.JumpStaminaCost))
             {
                 _velocity.y = Mathf.Sqrt(_playerJumpForce * -1f * GRAVITY);
                 _currentJumpCount++;
-                _staminaManager.UseStamina(_player.playerStats.jumpStaminaCost);
+                _staminaManager.UseStamina(_player.PlayerStats.JumpStaminaCost);
             }
         }
     }
@@ -164,12 +158,12 @@ public class PlayerMovingFunction : PlayerComponent
 
         if (Input.GetKeyDown(KeyCode.C) && !_isSliding && _slideCooldownTimer <= 0 && _moveDirection.magnitude > 0.1f)
         {
-            if (_staminaManager.CanUseStamina(_player.playerStats.slideStaminaCost))
+            if (_staminaManager.CanUseStamina(_player.PlayerStats.SlideStaminaCost))
             {
                 _isSliding = true;
                 _slideTimer = _slideDuration;
                 _slideCooldownTimer = _slideCooldown;
-                _staminaManager.UseStamina(_player.playerStats.slideStaminaCost);
+                _staminaManager.UseStamina(_player.PlayerStats.SlideStaminaCost);
             }
         }
     }

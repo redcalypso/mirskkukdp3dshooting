@@ -4,11 +4,12 @@ using TMPro;
 
 public class UI_Stamina : MonoBehaviour
 {
+    // requirements
+    [SerializeField] private PlayerStaminaFunction _staminaManager;
+
     [Header("UI References")]
     [SerializeField] private Slider _staminaSlider;
     
-    [SerializeField] private PlayerStaminaManager _staminaManager;
-
     private void Start()
     {
         if (_staminaSlider != null)
@@ -21,10 +22,6 @@ public class UI_Stamina : MonoBehaviour
     private void Update()
     {
         if (_staminaManager == null) return;
-
-        if (_staminaSlider != null)
-        {
-            _staminaSlider.value = _staminaManager.CurrentStamina;
-        }
+        if (_staminaSlider != null)  _staminaSlider.value = _staminaManager.CurrentStamina;
     }
 } 

@@ -39,10 +39,7 @@ public class UI_Grenade : MonoBehaviour
             chargeRing.fillAmount = fillAmount;
             chargeRing.color = Color.Lerp(emptyColor, fillColor, fillAmount);
 
-            if (_chargeTimer >= _maxChargeTime)
-            {
-                StopChargeUI();
-            }
+            if (_chargeTimer >= _maxChargeTime)  StopChargeUI();
         }
     }
 
