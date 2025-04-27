@@ -14,6 +14,9 @@ public class UI_Health : MonoBehaviour
     [SerializeField] private float _bleedEffectDuration = 1f;
     [SerializeField] private AnimationCurve _bleedEffectCurve;
 
+    private int _lastHealth;
+    private Coroutine _bleedEffectCoroutine;
+
     private void Start()
     {
         if(_player == null)
@@ -21,6 +24,7 @@ public class UI_Health : MonoBehaviour
             Debug.LogWarning("Player component not found");
             return;
         }
+        _lastHealth = _player.CurrentHealth;
         UpdateHealthUI();
     }
 
@@ -28,23 +32,25 @@ public class UI_Health : MonoBehaviour
     {
         if (_player != null)
         {
-            UpdateHealthUI();
+            if (_lastHealth != _player.CurrentHealth)
+            {
+                _lastHealth = _player.CurrentHealth;
+                UpdateHealthUI();
+            }
         }
     }
 
     private void UpdateHealthUI()
     {
         int currentHealth = _player.CurrentHealth;
-        
-        // Update health text
+
         _healthText.text = currentHealth.ToString();
-        
-        // Update text color based on health percentage
+
         float healthPercentage = (float)currentHealth / _player.PlayerStats.MaxHealth;
         _healthText.color = Color.Lerp(_healthTextColorEnd, _healthTextColorStart, healthPercentage);
 
-        // Trigger bleed effect
-        StartCoroutine(PlayBleedEffect());
+        if (_bleedEffectCoroutine != null) StopCoroutine(_bleedEffectCoroutine);
+        _bleedEffectCoroutine = StartCoroutine(PlayBleedEffect());
     }
 
     private IEnumerator PlayBleedEffect()
@@ -62,8 +68,8 @@ public class UI_Health : MonoBehaviour
             yield return null;
         }
 
-        // Reset alpha to 0
         bleedColor.a = 0f;
         _bleedFX.color = bleedColor;
+        _bleedEffectCoroutine = null;
     }
 }

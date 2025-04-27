@@ -133,7 +133,7 @@ MonoBehaviour:
   _destroyDelay: 5
   _damageableLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
   _explosionEffect: {fileID: 198656289721292014, guid: 64891a0eb28db934898420d80ca07cb3, type: 3}
   _explosionSound: {fileID: 0}
   _damagedMaterial: {fileID: 0}

@@ -425,7 +425,8 @@ GameObject:
   m_Component:
   - component: {fileID: 176857759}
   - component: {fileID: 176857760}
-  m_Layer: 3
+  - component: {fileID: 176857761}
+  m_Layer: 9
   m_Name: Hand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -465,6 +466,24 @@ MonoBehaviour:
   maxHandRotation: 80
   minHandRotation: -80
   recoilReturnSpeed: 5
+--- !u!114 &176857761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 176857758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbbb60602a22b7b438fc7413712e3651, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackRadius: 5
+  attackAngle: 90
+  damage: 80
+  _layerMask:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1 &205255562
 GameObject:
   m_ObjectHideFlags: 0
@@ -1141,7 +1160,7 @@ GameObject:
   - component: {fileID: 402571474}
   - component: {fileID: 402571475}
   - component: {fileID: 402571477}
-  m_Layer: 3
+  m_Layer: 9
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -1293,9 +1312,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _gunShootingFunction: {fileID: 3469287837123483974}
-  _mainWeapon: {fileID: 0}
+  _meleeFunction: {fileID: 176857761}
+  _mainWeapon: {fileID: 919132149622983770}
   _subWeapon: {fileID: 0}
-  _meleeWeapon: {fileID: 0}
+  _meleeWeapon: {fileID: 176857758}
   _grenadePrefab: {fileID: 3687854132075266607, guid: d91a4134b0424dd4f86b28a9228c3de1, type: 3}
   _grenadeSpawnPoint: {fileID: 771994512}
   _grenadeUI: {fileID: 697417234}
@@ -1602,7 +1622,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2005,7 +2025,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 771994512}
-  m_Layer: 3
+  m_Layer: 9
   m_Name: InstantiatePosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2556,7 +2576,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -45.900024, y: 49.380005}
+  m_AnchoredPosition: {x: -45.899902, y: 49.380005}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &1047113463
@@ -3491,7 +3511,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1291129776}
-  m_Layer: 3
+  m_Layer: 9
   m_Name: MuzzlePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4619,7 +4639,7 @@ GameObject:
   - component: {fileID: 3469287837123483973}
   - component: {fileID: 1711813855476510095}
   - component: {fileID: 3469287837123483974}
-  m_Layer: 3
+  m_Layer: 9
   m_Name: Assault_Rifle_M4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4785,6 +4805,14 @@ PrefabInstance:
     - target: {fileID: 4085053800303684041, guid: 87e788d279588cd4397d9b4d24e7e7d5, type: 3}
       propertyPath: _explosionForce
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4085053800303684041, guid: 87e788d279588cd4397d9b4d24e7e7d5, type: 3}
+      propertyPath: _explosionDamage
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 4085053800303684041, guid: 87e788d279588cd4397d9b4d24e7e7d5, type: 3}
+      propertyPath: _damageableLayers.m_Bits
+      value: 768
       objectReference: {fileID: 0}
     - target: {fileID: 5007677608879340357, guid: 87e788d279588cd4397d9b4d24e7e7d5, type: 3}
       propertyPath: m_Name

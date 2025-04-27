@@ -28,6 +28,7 @@ public class Enemy : MonoBehaviour, IDamageable
     private float _currentHealth;
     private bool _isKnockback;
     private float _knockbackEndTime;
+    private float _lastAttackTime; // 마지막 공격 시간
 
     public bool IsDead => _currentHealth <= 0;
 
@@ -123,8 +124,15 @@ public class Enemy : MonoBehaviour, IDamageable
         if (Vector3.Distance(transform.position, _player.position) > _enemyPreset.AttackDistance) _enemyState = EnemyState.Track;
         else
         {
-            // TODO: 공격 로직 구현
-            Debug.Log($"{gameObject.name} is attacking player!");
+            if (Time.time >= _lastAttackTime + _enemyPreset.AttackCoolTime)
+            {
+                IDamageable playerDamageable = _player.GetComponent<IDamageable>();
+                if (playerDamageable != null)
+                {
+                    playerDamageable.TakeDamage(_enemyPreset.AttackDamage);
+                    _lastAttackTime = Time.time;
+                }
+            }
         }
     }
 
@@ -174,7 +182,6 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void OnValidate()
     {
-        // Set the health bar position above the enemy
         if (_healthBarCanvas != null)
         {
             Vector3 position = transform.position;

@@ -11,6 +11,7 @@ public class PlayerAttackFunction : PlayerComponent
 {
     // requirements
     [SerializeField] private Weapon_GunShootingFunction _gunShootingFunction;
+    [SerializeField] private Weapon_MeleeFunction _meleeFunction;
 
     // imshi
     [SerializeField] private GameObject _mainWeapon;
@@ -49,6 +50,7 @@ public class PlayerAttackFunction : PlayerComponent
     {
         if (Input.GetMouseButton(0)) _gunShootingFunction.Shoot(); 
         if (Input.GetKeyDown(KeyCode.R)) _gunShootingFunction.Reload();
+        if (Input.GetKeyDown(KeyCode.F)) _meleeFunction.MeleeAttack();
 
         HandleGrenadeInput();
         HandleGrenadeRecharge();

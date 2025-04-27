@@ -8,7 +8,7 @@ public class Object_ExplosiveBarrel : MonoBehaviour, IDamageable
     [SerializeField] private float _maxHealth = 50f;
     [SerializeField] private float _currentHealth;
     [SerializeField] private float _explosionRadius = 5f;
-    [SerializeField] private float _explosionForce = 1000f;
+    [SerializeField] private float _explosionForce = 50f;
     [SerializeField] private int _explosionDamage = 50;
     [SerializeField] private float _destroyDelay = 3f;
     [SerializeField] private LayerMask _damageableLayers;
@@ -43,6 +43,7 @@ public class Object_ExplosiveBarrel : MonoBehaviour, IDamageable
     private void Explode()
     {
         if (_isExploded) return;
+        
         _isExploded = true;
 
         if (_explosionEffect != null)
