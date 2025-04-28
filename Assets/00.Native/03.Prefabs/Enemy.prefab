@@ -315,6 +315,7 @@ GameObject:
   - component: {fileID: 127001508473473145}
   - component: {fileID: 4757368866515420614}
   - component: {fileID: 5937280410979433702}
+  - component: {fileID: 8186461509945759473}
   m_Layer: 8
   m_Name: Enemy
   m_TagString: Untagged
@@ -429,6 +430,7 @@ MonoBehaviour:
   _enemyPreset: {fileID: 11400000, guid: c2144eb227ec00d45bc728eb02b12342, type: 2}
   _enemyState: 0
   _player: {fileID: 0}
+  _animator: {fileID: 0}
   _healthBarCanvas: {fileID: 6353679852588041097}
   _healthSlider: {fileID: 98739898892679188}
   _healthBarHeight: 1.24
@@ -454,6 +456,28 @@ NavMeshAgent:
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!95 &8186461509945759473
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7248400971799485764}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7552468182748085672
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,6 +6,7 @@ public enum EnemyState
 {
     Idle,
     Track,
+    Patrol,
     Return,
     Attack,
     Die
@@ -17,6 +18,7 @@ public class Enemy : MonoBehaviour, IDamageable
     [SerializeField] private EnemyPreset _enemyPreset;
     [SerializeField] private EnemyState _enemyState;
     [SerializeField] private Transform _player;
+    [SerializeField] private Animator _animator;
 
     [Header("Health Bar UI")]
     [SerializeField] private Canvas _healthBarCanvas;
