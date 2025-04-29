@@ -15,8 +15,8 @@ TagManager:
   - Terrain
   - Wall
   - Enemy
-  - Player
-  - 
+  - Player_TP
+  - Player_FP
   - 
   - 
   - 
