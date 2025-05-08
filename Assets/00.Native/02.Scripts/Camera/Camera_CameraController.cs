@@ -4,22 +4,22 @@ public enum CameraMode
 {
     FPS,
     TPS,
-    TopDown
+    TDV
 }
 
 public class Camera_CameraController : MonoBehaviour
 {
     [Header("Camera Settings")]
-    public CameraMode CurrentMode = CameraMode.FPS;
+    public CameraMode CurrentMode = CameraMode.TDV;
     public Transform Target;
     [SerializeField] private float _smoothSpeed = 10f;
 
     [Header("FPS Camera Settings")]
-    [SerializeField] private Vector3 _fpsOffset = new(0f, 0.45f, 0f);
+    [SerializeField] private Vector3 _fpsOffset = new(0f, 1.45f, 0f);
     [SerializeField] private Vector3 _fpsRotationOffset = Vector3.zero;
 
     [Header("TPS Camera Settings")]
-    [SerializeField] private Vector3 _tpsOffset = new(1.3f, 0.3f, -3f);
+    [SerializeField] private Vector3 _tpsOffset = new(1.3f, 1.3f, -3f);
     [SerializeField] private Vector3 _tpsRotationOffset = new(0.4f, 0f, 0f);
 
     [Header("Top-Down Camera Settings")]
@@ -30,20 +30,8 @@ public class Camera_CameraController : MonoBehaviour
     public float MouseSensitivity = 2f;
     public bool InvertY = false;
 
-    [Header("Recoil Settings")]
-    [SerializeField] private float _recoilReturnSpeed = 5f;
-    [SerializeField] private float _maxRecoilX = 10f;
-    [SerializeField] private float _maxRecoilY = 10f;
-    [SerializeField] private float _recoilAccumulationFactor = 1.2f;
-    [SerializeField] private float _maxAccumulatedRecoilX = 20f;
-    [SerializeField] private float _maxAccumulatedRecoilY = 20f;
-
     private float _rotationX = 0f;
     private float _rotationY = 0f;
-    private float _currentRecoilX = 0f;
-    private float _currentRecoilY = 0f;
-    private float _accumulatedRecoilX = 0f;
-    private float _accumulatedRecoilY = 0f;
 
     void Start()
     {
@@ -58,10 +46,9 @@ public class Camera_CameraController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F1)) SetCameraMode(CameraMode.FPS);
         else if (Input.GetKeyDown(KeyCode.F2)) SetCameraMode(CameraMode.TPS);
-        else if (Input.GetKeyDown(KeyCode.F3)) SetCameraMode(CameraMode.TopDown);
+        else if (Input.GetKeyDown(KeyCode.F3)) SetCameraMode(CameraMode.TDV);
 
         ProcessMouseInput();
-        UpdateRecoil();
     }
 
     void LateUpdate()
@@ -71,7 +58,7 @@ public class Camera_CameraController : MonoBehaviour
 
     private void ProcessMouseInput()
     {
-        if (CurrentMode != CameraMode.TopDown)
+        if (CurrentMode != CameraMode.TDV)
         {
             float mouseX = Input.GetAxis("Mouse X") * MouseSensitivity;
             float mouseY = Input.GetAxis("Mouse Y") * MouseSensitivity;
@@ -84,15 +71,6 @@ public class Camera_CameraController : MonoBehaviour
         }
     }
 
-    private void UpdateRecoil()
-    {
-        _accumulatedRecoilX = Mathf.Lerp(_accumulatedRecoilX, 0f, Time.deltaTime * _recoilReturnSpeed);
-        _accumulatedRecoilY = Mathf.Lerp(_accumulatedRecoilY, 0f, Time.deltaTime * _recoilReturnSpeed);
-
-        _currentRecoilX = Mathf.Lerp(_currentRecoilX, 0f, Time.deltaTime * _recoilReturnSpeed);
-        _currentRecoilY = Mathf.Lerp(_currentRecoilY, 0f, Time.deltaTime * _recoilReturnSpeed);
-    }
-
     private void UpdateCameraPositionAndRotation()
     {
         switch (CurrentMode)
@@ -103,7 +81,7 @@ public class Camera_CameraController : MonoBehaviour
             case CameraMode.TPS:
                 UpdateTPSCamera();
                 break;
-            case CameraMode.TopDown:
+            case CameraMode.TDV:
                 UpdateTopDownCamera();
                 break;
         }
@@ -114,8 +92,8 @@ public class Camera_CameraController : MonoBehaviour
         Vector3 desiredPosition = Target.position + Target.TransformDirection(_fpsOffset);
         transform.position = Vector3.Lerp(transform.position, desiredPosition, _smoothSpeed * Time.deltaTime);
 
-        float finalRotationX = _rotationX + _currentRecoilX + _accumulatedRecoilX;
-        float finalRotationY = _rotationY + _currentRecoilY + _accumulatedRecoilY;
+        float finalRotationX = _rotationX;
+        float finalRotationY = _rotationY;
 
         Quaternion targetRotation = Quaternion.Euler(
             finalRotationX + _fpsRotationOffset.x,
@@ -127,8 +105,8 @@ public class Camera_CameraController : MonoBehaviour
 
     void UpdateTPSCamera()
     {
-        float finalRotationX = _rotationX + _currentRecoilX + _accumulatedRecoilX;
-        float finalRotationY = _rotationY + _currentRecoilY + _accumulatedRecoilY;
+        float finalRotationX = _rotationX;
+        float finalRotationY = _rotationY;
 
         Vector3 rotation = new(
             finalRotationX + _tpsRotationOffset.x,
@@ -165,24 +143,5 @@ public class Camera_CameraController : MonoBehaviour
     public void SetCameraRotationX(float value)
     {
         _rotationX = value;
-    }
-
-    public void AddRecoil(float x, float y)
-    {
-        _currentRecoilX = Mathf.Clamp(_currentRecoilX - x, -_maxRecoilX, _maxRecoilX);
-        _currentRecoilY = Mathf.Clamp(_currentRecoilY + y, -_maxRecoilY, _maxRecoilY);
-
-        _accumulatedRecoilX = Mathf.Clamp(_accumulatedRecoilX - (x * _recoilAccumulationFactor), -_maxAccumulatedRecoilX, _maxAccumulatedRecoilX);
-        _accumulatedRecoilY = Mathf.Clamp(_accumulatedRecoilY + (y * _recoilAccumulationFactor), -_maxAccumulatedRecoilY, _maxAccumulatedRecoilY);
-    }
-
-    public float GetRecoilX()
-    {
-        return _currentRecoilX + _accumulatedRecoilX;
-    }
-
-    public float GetRecoilY()
-    {
-        return _currentRecoilY + _accumulatedRecoilY;
     }
 }

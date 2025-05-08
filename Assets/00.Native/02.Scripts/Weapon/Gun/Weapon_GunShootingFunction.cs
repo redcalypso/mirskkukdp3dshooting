@@ -116,7 +116,7 @@ public class Weapon_GunShootingFunction : MonoBehaviour
         float recoilX = recoilDirection.y * _gunPreset.recoilAmount * 10f;
         float recoilY = recoilDirection.x * _gunPreset.recoilAmount * 5f;
 
-        _cameraController.AddRecoil(recoilX, recoilY);
+        // _cameraController.AddRecoil(recoilX, recoilY);
 
         _currentRecoilIndex = (_currentRecoilIndex + 1) % _gunPreset.recoilPattern.Length;
     }

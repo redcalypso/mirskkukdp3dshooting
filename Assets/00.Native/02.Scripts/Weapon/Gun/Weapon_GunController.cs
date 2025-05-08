@@ -28,7 +28,7 @@ public class Weapon_GunController : MonoBehaviour
         if (_cameraController != null && handTransform != null)
         {
             float cameraRotationX = _cameraController.GetCameraRotationX();
-            float recoilX = _cameraController.GetRecoilX();
+            /*float recoilX = _cameraController.GetRecoilX();
             float recoilY = _cameraController.GetRecoilY();
             
             _targetRecoilX = recoilX;
@@ -39,7 +39,7 @@ public class Weapon_GunController : MonoBehaviour
             float targetRotation = Mathf.Clamp(cameraRotationX - _currentRecoilX, minHandRotation, maxHandRotation);
             
             Quaternion targetQuaternion = Quaternion.Euler(targetRotation, _currentRecoilY, 0f);
-            handTransform.localRotation = Quaternion.Slerp(handTransform.localRotation, targetQuaternion, handRotationSpeed * Time.deltaTime);
+            handTransform.localRotation = Quaternion.Slerp(handTransform.localRotation, targetQuaternion, handRotationSpeed * Time.deltaTime);*/
         }
     }
 } 

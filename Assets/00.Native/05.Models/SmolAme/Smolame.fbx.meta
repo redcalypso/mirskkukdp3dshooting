@@ -3,7 +3,27 @@ guid: 460d68e4eec657f458ca3ad2cc4077c7
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SmolameEye_3
+    second: {fileID: 2100000, guid: 80f02b1dba14f664185b6ea78bd46c55, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SmolameHead_2
+    second: {fileID: 2100000, guid: 184bc6ef131617e4fafaea067aca4867, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SmolameOutline_1
+    second: {fileID: 2100000, guid: 935274319ff48d044931ff7f6c58b5c8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Smolame_0
+    second: {fileID: 2100000, guid: 897117874746de346ae96fefc062f969, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
