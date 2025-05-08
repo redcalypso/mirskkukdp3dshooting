@@ -1,10 +1,12 @@
 using UnityEngine;
+
 public class PlayerMovingFunction : PlayerComponent
 {
     //requirements
     private CharacterController _characterController;
     private Camera_CameraController _cameraController; 
     private PlayerStaminaFunction _staminaManager;
+    private Animator _animator;
 
     [Header("Player Stats")]
     [SerializeField] private PlayerStats _playerStats;
@@ -30,6 +32,12 @@ public class PlayerMovingFunction : PlayerComponent
     private bool _isWallClimbing;
     private bool _isTouchingWall;
 
+    // Animation Parameters
+    private const string BLEND_X = "BlendX";
+    private const string BLEND_Y = "BlendY";
+    private const string ROLL_TRIGGER = "Roll";
+    private const string SPEED = "Speed";
+
     // moving variables
     private Vector3 _moveDirection;
     private float _currentSpeed;
@@ -45,8 +53,9 @@ public class PlayerMovingFunction : PlayerComponent
         _characterController = GetComponent<CharacterController>();
         _cameraController = Camera.main.GetComponent<Camera_CameraController>();
         _staminaManager = GetComponent<PlayerStaminaFunction>();
+        _animator = GetComponentInChildren<Animator>();
 
-        if (_characterController == null || _cameraController == null || _staminaManager == null)
+        if (_characterController == null || _cameraController == null || _staminaManager == null || _animator == null)
         {
             Debug.LogError($"[{GetType().Name}] Required components not found!");
             return;
@@ -93,6 +102,21 @@ public class PlayerMovingFunction : PlayerComponent
         float vertical = Input.GetAxis("Vertical");
         Vector2 moveInput = new Vector2(horizontal, vertical);
 
+        // Update animation blend parameters
+        if (_animator != null)
+        {
+            _animator.SetFloat(BLEND_X, horizontal);
+            _animator.SetFloat(BLEND_Y, vertical);
+            
+            // Calculate and set speed parameter (0 to 1)
+            float speedValue = moveInput.magnitude;
+            if (Input.GetKey(KeyCode.LeftShift) && _staminaManager.CanUseStamina(_player.PlayerStats.SprintStaminaCost * Time.deltaTime))
+            {
+                speedValue = 1f; // Sprint is always at max speed
+            }
+            _animator.SetFloat(SPEED, speedValue);
+        }
+
         if (moveInput.magnitude > 0.1f)
         {
             Vector3 dir = new Vector3(moveInput.x, 0, moveInput.y);
@@ -107,7 +131,17 @@ public class PlayerMovingFunction : PlayerComponent
             }
             else _currentSpeed = _playerMoveSpeed;
         }
-        else _moveDirection = Vector3.zero;
+        else 
+        {
+            _moveDirection = Vector3.zero;
+            // Reset blend parameters when not moving
+            if (_animator != null)
+            {
+                _animator.SetFloat(BLEND_X, 0);
+                _animator.SetFloat(BLEND_Y, 0);
+                _animator.SetFloat(SPEED, 0);
+            }
+        }
     }
 
     private void HandleJump()
@@ -152,7 +186,16 @@ public class PlayerMovingFunction : PlayerComponent
         {
             _slideTimer -= Time.deltaTime;
             if (_slideTimer <= 0)
+            {
                 _isSliding = false;
+                // Reset blend parameters when slide ends
+                if (_animator != null)
+                {
+                    _animator.SetFloat(BLEND_X, 0);
+                    _animator.SetFloat(BLEND_Y, 0);
+                    _animator.SetFloat(SPEED, 0);
+                }
+            }
             else _characterController.Move(_moveDirection * _slideSpeed * Time.deltaTime);
         }
 
@@ -164,6 +207,12 @@ public class PlayerMovingFunction : PlayerComponent
                 _slideTimer = _slideDuration;
                 _slideCooldownTimer = _slideCooldown;
                 _staminaManager.UseStamina(_player.PlayerStats.SlideStaminaCost);
+
+                // Trigger roll animation
+                if (_animator != null)
+                {
+                    _animator.SetTrigger(ROLL_TRIGGER);
+                }
             }
         }
     }
