@@ -15,7 +15,7 @@ public class PlayerMovingFunction : PlayerComponent
     [SerializeField] private float _playerMoveSpeed = 5f;
     [SerializeField] private float _playerSprintSpeed = 8f;
     [SerializeField] private float _playerJumpForce = 2f;
-    [SerializeField] private int _playerMaxJumpCount = 2;
+    [SerializeField] private int _playerMaxJumpCount = 1;
 
     [Header("Slide Settings")]
     [SerializeField] private float _slideSpeed = 12f;
@@ -36,6 +36,7 @@ public class PlayerMovingFunction : PlayerComponent
     private const string BLEND_X = "BlendX";
     private const string BLEND_Y = "BlendY";
     private const string ROLL_TRIGGER = "Roll";
+    private const string JUMP_TRIGGER = "Jump";
     private const string SPEED = "Speed";
 
     // moving variables
@@ -70,10 +71,10 @@ public class PlayerMovingFunction : PlayerComponent
         if (_player == null || _staminaManager == null) return;
 
         HandleMovement();
-        CheckWallCollision();
-        HandleWallClimbing();
+        // CheckWallCollision();
+        // HandleWallClimbing();
         HandleJump();
-        HandleSlide();
+        // HandleSlide();
 
         if (_moveDirection.magnitude > 0.1f && !_isSliding) _characterController.Move(_moveDirection * _currentSpeed * Time.deltaTime);
 
@@ -119,9 +120,13 @@ public class PlayerMovingFunction : PlayerComponent
 
         if (moveInput.magnitude > 0.1f)
         {
+            
             Vector3 dir = new Vector3(moveInput.x, 0, moveInput.y);
-            _moveDirection = Camera.main.transform.TransformDirection(dir).normalized;
+            if (_cameraController.CurrentMode != CameraMode.TDV) _moveDirection = Camera.main.transform.TransformDirection(dir).normalized;
+            else _moveDirection = dir.normalized;
+
             _moveDirection.y = 0;
+            
 
             // sprint
             if (Input.GetKey(KeyCode.LeftShift) && _staminaManager.CanUseStamina(_player.PlayerStats.SprintStaminaCost * Time.deltaTime))
@@ -134,6 +139,7 @@ public class PlayerMovingFunction : PlayerComponent
         else 
         {
             _moveDirection = Vector3.zero;
+
             // Reset blend parameters when not moving
             if (_animator != null)
             {
@@ -155,6 +161,11 @@ public class PlayerMovingFunction : PlayerComponent
                 _velocity.y = Mathf.Sqrt(_playerJumpForce * -1f * GRAVITY);
                 _currentJumpCount++;
                 _staminaManager.UseStamina(_player.PlayerStats.JumpStaminaCost);
+
+                if(_animator != null)
+                {
+                    _animator.SetTrigger(JUMP_TRIGGER);
+                }
             }
         }
     }

@@ -15,7 +15,7 @@ ModelImporter:
     resampleCurves: 1
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
-    motionNodeName: 
+    motionNodeName: SmolameRig
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -30,35 +30,6 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations:
-    - serializedVersion: 16
-      name: mixamo.com (1)
-      takeName: mixamo.com
-      internalID: -3100369314251171874
-      firstFrame: 0
-      lastFrame: 71
-      wrapMode: 0
-      orientationOffsetY: 0
-      level: 0
-      cycleOffset: 0
-      loop: 0
-      hasAdditiveReferencePose: 0
-      loopTime: 0
-      loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
-      keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
-      heightFromFeet: 0
-      mirror: 0
-      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
-      events: []
-      transformMask: []
-      maskType: 3
-      maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
     - serializedVersion: 16
       name: mixamo.com
       takeName: mixamo.com
@@ -84,8 +55,88 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events: []
-      transformMask: []
-      maskType: 3
+      transformMask:
+      - path: 
+        weight: 1
+      - path: ametorso
+        weight: 1
+      - path: SmolameRig
+        weight: 0
+      - path: SmolameRig/spine
+        weight: 1
+      - path: SmolameRig/spine/pelvis_L
+        weight: 1
+      - path: SmolameRig/spine/pelvis_R
+        weight: 1
+      - path: SmolameRig/spine/skirt_L
+        weight: 1
+      - path: SmolameRig/spine/skirt_R
+        weight: 1
+      - path: SmolameRig/spine/skirtback_L
+        weight: 1
+      - path: SmolameRig/spine/skirtback_R
+        weight: 1
+      - path: SmolameRig/spine/skirtside_L
+        weight: 1
+      - path: SmolameRig/spine/skirtside_R
+        weight: 1
+      - path: SmolameRig/spine/spine_001
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/shoulder_L
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/shoulder_L/upper_arm_L
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/shoulder_L/upper_arm_L/forearm_L
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/shoulder_L/upper_arm_L/forearm_L/hand_L
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/shoulder_R
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/shoulder_R/upper_arm_R
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/shoulder_R/upper_arm_R/forearm_R
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/shoulder_R/upper_arm_R/forearm_R/hand_R
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/spine_004
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/spine_004/spine_005
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/spine_004/spine_005/spine_006
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/spine_004/spine_005/spine_006/hair_L
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/spine_004/spine_005/spine_006/hair_R
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/spine_004/spine_005/spine_006/hairB
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/spine_004/spine_005/spine_006/hairB/hairB2
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/spine_004/spine_005/spine_006/hairF
+        weight: 1
+      - path: SmolameRig/spine/spine_001/spine_002/spine_003/spine_004/spine_005/spine_006/hat
+        weight: 1
+      - path: SmolameRig/spine/thigh_L
+        weight: 1
+      - path: SmolameRig/spine/thigh_L/shin_L
+        weight: 1
+      - path: SmolameRig/spine/thigh_L/shin_L/foot_L
+        weight: 1
+      - path: SmolameRig/spine/thigh_L/shin_L/foot_L/toe_L
+        weight: 1
+      - path: SmolameRig/spine/thigh_R
+        weight: 1
+      - path: SmolameRig/spine/thigh_R/shin_R
+        weight: 1
+      - path: SmolameRig/spine/thigh_R/shin_R/foot_R
+        weight: 1
+      - path: SmolameRig/spine/thigh_R/shin_R/foot_R/toe_R
+        weight: 1
+      maskType: 0
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     isReadable: 0
@@ -99,7 +150,7 @@ ModelImporter:
     importPhysicalCameras: 1
     importVisibility: 1
     importBlendShapes: 1
-    importCameras: 1
+    importCameras: 0
     importLights: 1
     nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
