@@ -1,7 +1,16 @@
 using UnityEngine;
 
+public enum BillboardType
+{
+    ForPlayer,
+    ForEnemy,
+}
+
 public class Billboard : MonoBehaviour
 {
+    // requirements
+    private BillboardType _billboardType;
+
     private Camera _mainCamera;
     private bool _isVisible = true;
 
@@ -14,9 +23,17 @@ public class Billboard : MonoBehaviour
     {
         if (_mainCamera == null) return;
 
-        // Check if the object is visible to the camera
-        _isVisible = IsVisibleToCamera();
-        gameObject.SetActive(_isVisible);
+        switch(_billboardType)
+        {
+            case BillboardType.ForPlayer:
+                _isVisible = true;
+                break;
+            case BillboardType.ForEnemy:
+                // Check if the object is visible to the camera
+                _isVisible = IsVisibleToCamera();
+                gameObject.SetActive(_isVisible);
+                break;
+        }
 
         if (_isVisible)
         {

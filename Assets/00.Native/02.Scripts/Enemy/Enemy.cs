@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -30,7 +32,26 @@ public class Enemy : MonoBehaviour, IDamageable
     private float _currentHealth;
     private bool _isKnockback;
     private float _knockbackEndTime;
-    private float _lastAttackTime; // 마지막 공격 시간
+    private float _lastAttackTime; 
+    private Vector3[] _patrolPoints;
+    private int _currentPatrolIndex;
+    private float _idleTimer;
+    private float _idleDuration = 5f; // 몇 초 후 순찰 시작
+    private bool _isWaitingAtPatrolPoint;
+    private float _waitEndTime;
+    [SerializeField] private float _patrolWaitDuration = 2f; // 정지 시간
+
+    [Header("Patrol Settings (Dynamic)")]   
+    [SerializeField] private float _patrolRadius = 10f;
+    [SerializeField] private LayerMask _groundLayer;
+    [SerializeField] private float _raycastHeightOffset = 10f;
+    [SerializeField] private float _raycastMaxDistance = 20f;
+
+    // Animator Variable
+    private const string ISATTACKING = "Attack";
+    private const string HITREACTION = "HitReaction";
+    private const string MOVINGSPEED = "Speed";
+    private const string ENEMYDEATH = "Death";
 
     public bool IsDead => _currentHealth <= 0;
 
@@ -45,10 +66,7 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         _player = GameObject.FindGameObjectWithTag("Player")?.transform;
         
-        if (_player == null)
-        {
-            Debug.LogWarning("Player Tag Missing");
-        }
+        if (_player == null) Debug.LogWarning("Player Tag Missing");
 
         _enemyState = EnemyState.Idle;
         InitializeHealthBar();
@@ -81,6 +99,9 @@ public class Enemy : MonoBehaviour, IDamageable
             case EnemyState.Idle:
                 Idle();
                 break;
+            case EnemyState.Patrol:
+                Patrol();
+                break;
             case EnemyState.Track:
                 Track();
                 break;
@@ -99,6 +120,57 @@ public class Enemy : MonoBehaviour, IDamageable
     private void Idle()
     {
         if (_player != null && Vector3.Distance(transform.position, _player.position) < _enemyPreset.FindDistance) _enemyState = EnemyState.Track;
+        
+        _animator.SetFloat(MOVINGSPEED, 0);
+
+        if (_player != null && Vector3.Distance(transform.position, _player.position) < _enemyPreset.FindDistance)
+        {
+            _enemyState = EnemyState.Track;
+            _idleTimer = 0f;
+            return;
+        }
+
+        _idleTimer += Time.deltaTime;
+        if (_idleTimer >= _idleDuration)
+        {
+            _idleTimer = 0f;
+            _enemyState = EnemyState.Patrol;
+        }
+    }
+    
+    private void Patrol()
+    {
+        if (_isWaitingAtPatrolPoint)
+        {
+            _animator.SetFloat(MOVINGSPEED, 0);
+
+            if (Time.time >= _waitEndTime)
+            {
+                _isWaitingAtPatrolPoint = false;
+                GenerateNextPatrolPoint();
+            }
+            return;
+        }
+
+        if (_patrolPoints == null || _patrolPoints.Length == 0)
+        {
+            GenerateNextPatrolPoint();
+            return;
+        }
+
+        Vector3 targetPoint = _patrolPoints[_currentPatrolIndex];
+        _agent.SetDestination(targetPoint);
+
+        float speedValue = _agent.velocity.magnitude / _agent.speed;
+        _animator.SetFloat(MOVINGSPEED, speedValue);
+
+        if (Vector3.Distance(transform.position, targetPoint) < 0.5f)
+        {
+            _isWaitingAtPatrolPoint = true;
+            _waitEndTime = Time.time + _patrolWaitDuration;
+        }
+
+        if (_player != null && Vector3.Distance(transform.position, _player.position) < _enemyPreset.FindDistance) _enemyState = EnemyState.Track;
     }
 
     private void Track()
@@ -110,11 +182,19 @@ public class Enemy : MonoBehaviour, IDamageable
         float distanceToPlayer = Vector3.Distance(transform.position, _player.position);
         if (distanceToPlayer > _enemyPreset.FindDistance)  _enemyState = EnemyState.Return;
         else if (distanceToPlayer <= _enemyPreset.AttackDistance) _enemyState = EnemyState.Attack;
+
+        float speedValue = _agent.velocity.magnitude / _agent.speed;
+        _animator.SetFloat(MOVINGSPEED, speedValue);
+
     }
 
     private void Return()
     {
         _agent.SetDestination(_startPosition);
+
+        float speedValue = _agent.velocity.magnitude / _agent.speed;
+        _animator.SetFloat(MOVINGSPEED, speedValue);
+
 
         if (Vector3.Distance(transform.position, _startPosition) <= 0.1f) _enemyState = EnemyState.Idle;
     }
@@ -129,10 +209,13 @@ public class Enemy : MonoBehaviour, IDamageable
             if (Time.time >= _lastAttackTime + _enemyPreset.AttackCoolTime)
             {
                 IDamageable playerDamageable = _player.GetComponent<IDamageable>();
+                
                 if (playerDamageable != null)
                 {
                     playerDamageable.TakeDamage(_enemyPreset.AttackDamage);
                     _lastAttackTime = Time.time;
+
+                    _animator.SetTrigger(ISATTACKING);
                 }
             }
         }
@@ -140,7 +223,16 @@ public class Enemy : MonoBehaviour, IDamageable
 
     private void Die()
     {
-        // TODO: 사망 효과 추가
+        _animator.SetBool(ENEMYDEATH, true);
+        _agent.enabled = false;
+        this.enabled = false;
+
+        StartCoroutine(DelayedDisable());
+    }
+
+    private IEnumerator DelayedDisable()
+    {
+        yield return new WaitForSeconds(3f); // 애니메이션 재생 시간
         gameObject.SetActive(false);
     }
 
@@ -180,7 +272,27 @@ public class Enemy : MonoBehaviour, IDamageable
         
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null) rb.AddForce(knockbackDirection * _enemyPreset.KnockbackForce, ForceMode.Impulse);
+
+        if (!_animator.GetCurrentAnimatorStateInfo(0).IsName("Zombie Reaction Hit"))
+        {
+            _animator.SetTrigger(HITREACTION);
+        }
     }
+
+    private void GenerateNextPatrolPoint()
+    {
+        Vector2 randomCircle = Random.insideUnitCircle * _patrolRadius;
+        Vector3 rayOrigin = transform.position + new Vector3(randomCircle.x, _raycastHeightOffset, randomCircle.y);
+
+        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, _raycastMaxDistance, _groundLayer))
+        {
+            _patrolPoints = new Vector3[1];
+            _patrolPoints[0] = hit.point;
+            _currentPatrolIndex = 0;
+        }
+        else Debug.LogWarning($"{name} 순찰 위치 생성 실패");
+    }
+
 
     private void OnValidate()
     {
