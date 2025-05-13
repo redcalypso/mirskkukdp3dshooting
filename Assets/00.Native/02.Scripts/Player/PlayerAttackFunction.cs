@@ -52,8 +52,8 @@ public class PlayerAttackFunction : PlayerComponent
         if (Input.GetKeyDown(KeyCode.R)) _gunShootingFunction.Reload();
         if (Input.GetKeyDown(KeyCode.F)) _meleeFunction.MeleeAttack();
 
-        HandleGrenadeInput();
-        HandleGrenadeRecharge();
+        // HandleGrenadeInput();
+        // HandleGrenadeRecharge();
     }
 
     private void HandleGrenadeInput()

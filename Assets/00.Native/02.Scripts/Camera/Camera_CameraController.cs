@@ -10,7 +10,7 @@ public enum CameraMode
 public class Camera_CameraController : MonoBehaviour
 {
     [Header("Camera Settings")]
-    public CameraMode CurrentMode = CameraMode.TDV;
+    public CameraMode CurrentMode = CameraMode.TPS;
     public Transform Target;
     [SerializeField] private float _smoothSpeed = 10f;
 
@@ -44,8 +44,8 @@ public class Camera_CameraController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.F1)) SetCameraMode(CameraMode.FPS);
-        else if (Input.GetKeyDown(KeyCode.F2)) SetCameraMode(CameraMode.TPS);
+        // if (Input.GetKeyDown(KeyCode.F1)) SetCameraMode(CameraMode.FPS);
+        if (Input.GetKeyDown(KeyCode.F2)) SetCameraMode(CameraMode.TPS);
         else if (Input.GetKeyDown(KeyCode.F3)) SetCameraMode(CameraMode.TDV);
 
         ProcessMouseInput();

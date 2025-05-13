@@ -9,9 +9,11 @@ public class UI_Ammo : MonoBehaviour
     [SerializeField] private Color fillColor = new Color(1f, 1f, 1f, 0.5f);
     [SerializeField] private Color emptyColor = new Color(1f, 1f, 1f, 0f);
 
+
     private float _reloadTimer;
     private float _maxReloadTime;
     private bool _isReloading;
+    private Camera mainCam;
 
     private void Awake()
     {
@@ -28,6 +30,8 @@ public class UI_Ammo : MonoBehaviour
             reloadRing.color = emptyColor;
             reloadRing.gameObject.SetActive(false);
         }
+
+        mainCam = Camera.main;
     }
 
     private void Update()
@@ -45,7 +49,7 @@ public class UI_Ammo : MonoBehaviour
 
     public void UpdateAmmoText(int currentAmmo, int maxAmmo)
     {
-        if (ammoText != null) ammoText.text = $"{currentAmmo:D2}/{maxAmmo:D2}";
+        if (ammoText != null) ammoText.text = $"{currentAmmo:D2}";
     }
 
     public void StartReloadUI(float reloadTime)

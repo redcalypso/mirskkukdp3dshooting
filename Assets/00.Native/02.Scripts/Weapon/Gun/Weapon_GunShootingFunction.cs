@@ -20,12 +20,9 @@ public class Weapon_GunShootingFunction : MonoBehaviour
     private float _nextFireTime;
     private bool _isReloading;
     private float _reloadTimer;
-    private int _currentRecoilIndex;
     private float _lastShotTime;
-    private float _recoilResetTime = 0.5f;
     private float _fireTimer = 0f;
 
-    private Sequence _recoilSequence;
 
     private Vector3 _originalPosition;
     private Quaternion _originalRotation;
@@ -44,11 +41,6 @@ public class Weapon_GunShootingFunction : MonoBehaviour
         UpdateAmmoUI();
     }
 
-    private void OnDestroy()
-    {
-        _recoilSequence?.Kill();
-    }
-
     private void Update()
     {
         _fireTimer += Time.deltaTime;
@@ -63,8 +55,6 @@ public class Weapon_GunShootingFunction : MonoBehaviour
                 UpdateAmmoUI();
             }
         }
-        if (Time.time - _lastShotTime > _recoilResetTime) _currentRecoilIndex = 0;
-        
     }
 
     public void Shoot()
@@ -92,8 +82,6 @@ public class Weapon_GunShootingFunction : MonoBehaviour
 
         if (_gunPreset.muzzleFlash != null) Instantiate(_gunPreset.muzzleFlash, _muzzlePoint.position, _muzzlePoint.rotation);
         PlaySound(_gunPreset.shootSound);
-        ApplyRecoil();
-        ApplyGunShake();
 
         RaycastHit hit;
 
@@ -104,35 +92,6 @@ public class Weapon_GunShootingFunction : MonoBehaviour
         }
 
         UpdateAmmoUI();
-    }
-
-    private void ApplyRecoil()
-    {
-        _recoilSequence?.Kill();
-        _recoilSequence = DOTween.Sequence();
-
-        Vector2 recoilDirection = _gunPreset.recoilPattern[_currentRecoilIndex];
-        
-        float recoilX = recoilDirection.y * _gunPreset.recoilAmount * 10f;
-        float recoilY = recoilDirection.x * _gunPreset.recoilAmount * 5f;
-
-        // _cameraController.AddRecoil(recoilX, recoilY);
-
-        _currentRecoilIndex = (_currentRecoilIndex + 1) % _gunPreset.recoilPattern.Length;
-    }
-
-    private void ApplyGunShake()
-    {
-        Vector3 shakeOffset = new Vector3(
-            Random.Range(-_shakeAmount, _shakeAmount),
-            Random.Range(-_shakeAmount, _shakeAmount),
-            Random.Range(-_shakeAmount, _shakeAmount)
-        );
-
-        Sequence shakeSequence = DOTween.Sequence();
-
-        shakeSequence.Append(transform.DOLocalMove(_originalPosition + shakeOffset, _shakeDuration * 0.5f)).Append(transform.DOLocalMove(_originalPosition, _shakeDuration * 0.5f));
-        shakeSequence.SetEase(Ease.OutQuad);
     }
 
     public void Reload()

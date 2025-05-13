@@ -183,7 +183,7 @@ public class Enemy : MonoBehaviour, IDamageable
         if (distanceToPlayer > _enemyPreset.FindDistance)  _enemyState = EnemyState.Return;
         else if (distanceToPlayer <= _enemyPreset.AttackDistance) _enemyState = EnemyState.Attack;
 
-        float speedValue = _agent.velocity.magnitude / _agent.speed;
+        float speedValue = _agent.velocity.magnitude * 2 / _agent.speed;
         _animator.SetFloat(MOVINGSPEED, speedValue);
 
     }
