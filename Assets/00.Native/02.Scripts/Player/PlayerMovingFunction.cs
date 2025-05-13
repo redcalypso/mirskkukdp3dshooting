@@ -49,10 +49,6 @@ public class PlayerMovingFunction : PlayerComponent
     private bool _isFalling;
     private const float TERMINAL_VELOCITY = -20f; // 최대 낙하 속도
 
-    private bool _justJumped = false;
-    private const float JUMPTRACETIME = 0.3f; // 점프 후 바닥 무시 시간(초)
-    private float _jumpGraceTimer = 0f;
-
     protected override void Awake()
     {
         base.Awake();
@@ -78,58 +74,41 @@ public class PlayerMovingFunction : PlayerComponent
         if (_player == null || _staminaManager == null) return;
 
         HandleMovement();
+        HandleJump();
+
         // CheckWallCollision();
         // HandleWallClimbing();
-        HandleJump();
         // HandleSlide();
 
-        // 점프 직후 일정 시간 동안은 바닥 판정 무시
-        if (_justJumped)
-        {
-            _jumpGraceTimer -= Time.deltaTime;
-            if (_jumpGraceTimer <= 0f)
-                _justJumped = false;
-        }
-
-        // 중력 적용 및 터미널 속도 제한
         if (!_isWallClimbing)
         {
             _velocity.y += GRAVITY * Time.deltaTime;
-            if (_velocity.y < TERMINAL_VELOCITY)
-                _velocity.y = TERMINAL_VELOCITY;
+            if (_velocity.y < TERMINAL_VELOCITY) _velocity.y = TERMINAL_VELOCITY;
         }
 
-        // 이동 벡터 계산
         Vector3 horizontalMove = _moveDirection * _currentSpeed;
         Vector3 totalMove = new Vector3(horizontalMove.x, _velocity.y, horizontalMove.z);
 
         _characterController.Move(totalMove * Time.deltaTime);
 
-        // 낙하 상태 감지 및 애니메이션 처리
         if (!_characterController.isGrounded && _velocity.y < -0.1f)
         {
-            if (!_isFalling)
+            if(!_isFalling)
             {
                 _isFalling = true;
-                if (_animator != null)
-                    _animator.SetBool(IS_FALLING, true);
+                _animator.SetBool(IS_FALLING, true);
+                _velocity.y = -0.1f;
             }
         }
-        else
+        else if(_characterController.isGrounded)
         {
-            if (!_isFalling)
+            if(_isFalling)
             {
                 _isFalling = false;
-                if (_animator != null)
-                    _animator.SetBool(IS_FALLING, false);
+                _animator.SetBool(IS_FALLING, false);
             }
-            // 바닥에 닿았을 때 y속도 초기화 (단, 점프 직후는 무시)
-            if (!_justJumped)
-                _velocity.y = 0f;
         }
 
-        if (_characterController.collisionFlags == CollisionFlags.Below && !_justJumped)
-            _currentJumpCount = 0;
     }
 
     private void CheckWallCollision()
@@ -143,14 +122,11 @@ public class PlayerMovingFunction : PlayerComponent
     }
 
     private void HandleMovement()
-    {
-        if (_player == null || _staminaManager == null) return;
-
+    {   
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
         Vector2 moveInput = new Vector2(horizontal, vertical);
 
-        // Update animation blend parameters
         if (_animator != null)
         {
             _animator.SetFloat(BLEND_X, horizontal);
@@ -186,7 +162,7 @@ public class PlayerMovingFunction : PlayerComponent
         {
             _moveDirection = Vector3.zero;
 
-            // Reset blend parameters when not moving
+            // Reset blend parameter
             if (_animator != null)
             {
                 _animator.SetFloat(BLEND_X, 0);
@@ -198,32 +174,24 @@ public class PlayerMovingFunction : PlayerComponent
 
     private void HandleJump()
     {
-        if (_player == null || _staminaManager == null) return;
-
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (_currentJumpCount < _playerMaxJumpCount && _staminaManager.CanUseStamina(_player.PlayerStats.JumpStaminaCost))
             {
-                _velocity.y = Mathf.Sqrt(_playerJumpForce * -2.5f * GRAVITY); // 더 자연스러운 점프
+                _velocity.y = Mathf.Sqrt(_playerJumpForce * -2.5f * GRAVITY);
                 _currentJumpCount++;
                 _staminaManager.UseStamina(_player.PlayerStats.JumpStaminaCost);
 
-                _justJumped = true;
-                _jumpGraceTimer = JUMPTRACETIME;
-
-                if (_animator != null)
-                {
-                    _animator.SetTrigger(JUMP_TRIGGER);
-                }
+                if (_animator != null) _animator.SetTrigger(JUMP_TRIGGER);
             }
             else if (!_staminaManager.CanUseStamina(_player.PlayerStats.JumpStaminaCost)) UI_Stamina.Instance.OnStaminaUseFailed();
         }
+
+        if (_characterController.collisionFlags == CollisionFlags.Below) _currentJumpCount = 0;
     }
 
     private void HandleWallClimbing()
     {
-        if (_player == null || _staminaManager == null) return;
-
         if (Input.GetKey(KeyCode.Space))
         {
             if (_staminaManager.CanUseStamina(_wallClimbSpeed * Time.deltaTime) && _isTouchingWall)
@@ -239,8 +207,6 @@ public class PlayerMovingFunction : PlayerComponent
 
     private void HandleSlide()
     {
-        if (_player == null || _staminaManager == null) return;
-
         if (_slideCooldownTimer > 0) _slideCooldownTimer -= Time.deltaTime;
 
         if (_isSliding)
@@ -249,7 +215,7 @@ public class PlayerMovingFunction : PlayerComponent
             if (_slideTimer <= 0)
             {
                 _isSliding = false;
-                // Reset blend parameters when slide ends
+                // Reset blend parameter
                 if (_animator != null)
                 {
                     _animator.SetFloat(BLEND_X, 0);
