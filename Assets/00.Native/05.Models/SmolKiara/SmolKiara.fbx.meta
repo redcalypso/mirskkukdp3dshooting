@@ -3,7 +3,27 @@ guid: a493547f38cf1324cbc752c09dfdf4e2
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Smolkiara
+    second: {fileID: 2100000, guid: 294a2a34acb6a9042b97f82d705f8b08, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SmolkiaraEye
+    second: {fileID: 2100000, guid: 34ba8fa6cf052b14db184d0e8ce42cd6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SmolkiaraHead
+    second: {fileID: 2100000, guid: e02aad0447267e1428fed3add7c4ad9d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SmolkiaraOutline
+    second: {fileID: 2100000, guid: a3a2a0f051aefc14ba2af24cc5aae5d1, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
